@@ -1,0 +1,29 @@
+#!/bin/sh
+awk '
+function pi() {
+  return atan2(0, -1)
+}
+function deg_to_rad(deg) {
+  return pi() * deg / 180
+}
+function distance(lat_1, lon_1, lat_2, lon_2) {
+  rx = 6378137.000
+  ry = 6356752.314245
+  e2 = (rx^2 - ry^2) / rx^2
+  rad_lat_1 = deg_to_rad(lat_1)
+  rad_lon_1 = deg_to_rad(lon_1)
+  rad_lat_2 = deg_to_rad(lat_2)
+  rad_lon_2 = deg_to_rad(lon_2)
+  dy = rad_lat_1 - rad_lat_2
+  dx = rad_lon_1 - rad_lon_2
+  p = (rad_lat_1 + rad_lat_2) / 2
+  w2 = 1 - e2 * sin(p) * sin(p)
+  m = (rx * (1 - e2)) / (w2 * sqrt(w2))
+  n = rx / sqrt(w2)
+  d = sqrt((dy * m) ^ 2 + (dx * n * cos(p)) ^ 2)
+  return d
+}
+{
+  printf("%.10f\n", distance($1, $2, $3, $4))
+}
+'
